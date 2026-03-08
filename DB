@@ -1,0 +1,32 @@
+HELPASSEMBLY-Ai/
+│
+├── app/
+│   ├── layout.tsx
+│   ├── page.tsx
+│   ├── services/
+│   │   └── page.tsx
+│   ├── pricing/
+│   │   └── page.tsx
+│   ├── booking/
+│   │   └── page.tsx
+│   └── api/
+│       └── booking/
+│           └── route.ts
+│
+├── components/
+│   ├── Header.tsx
+│   ├── Footer.tsx
+│   ├── ServiceCard.tsx
+│   └── CTAButton.tsx
+│
+├── public/
+│   ├── logo.png
+│   └── hero.jpg
+│
+├── styles/
+│   └── globals.css
+│
+├── package.json
+├── tsconfig.json
+├── next.config.js
+└── README.md
