@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-grotesk:  'Space Grotesk', sans-serif;
+    --font-inter:    'Inter', sans-serif;
+    --font-playfair: 'Playfair Display', serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: #F0F0F3;
+    color: #111111;
+    font-family: var(--font-inter);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-grotesk);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+}
+
+@layer utilities {
+  .neu-raised  { box-shadow: 20px 20px 60px #D1D1D4, -20px -20px 60px #FFFFFF; }
+  .neu-pressed { box-shadow: inset 5px 5px 10px #D1D1D4, inset -5px -5px 10px #FFFFFF; }
+  .neu-float   { box-shadow: 30px 30px 80px rgba(209,209,212,.6), -30px -30px 80px rgba(255,255,255,.8); }
+
+  .text-gradient-hero {
+    background: linear-gradient(135deg, #C59E37 0%, #F2C94C 50%, #D90429 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glass {
+    background: rgba(240,240,243,0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+
+  .scrapbook-tilt-neg { transform: rotate(-2deg); }
+  .scrapbook-tilt-pos { transform: rotate(1.5deg); }
+  .scrapbook-tilt-big { transform: rotate(-1deg); }
+
+  /* Scrollbar hidden for marquee parent */
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+/* Details/summary FAQ */
+details summary::-webkit-details-marker { display: none; }
+details summary { list-style: none; }
