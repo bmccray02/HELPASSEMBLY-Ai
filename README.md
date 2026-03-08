@@ -1,25 +1,22 @@
-# HELPASSEMBLY-Ai
-Iam Principle
-Help Assembly Website
-This repository contains the new Help Assembly Services website.
+# HelpAssembly-Ai
 
-The site will be hosted on Vercel.
+This repository contains the new Help Assembly Services website, built with Next.js and deployed on Vercel.
 
-Primary services:
+## Services
+- Furniture Assembly  
+- TV Mounting  
+- Fitness Equipment Assembly  
+- Gazebo Installation  
+- Playset Assembly  
 
-Furniture Assembly
-TV Mounting
-Fitness Equipment Assembly
-Gazebo Installation
-Playset Assembly
-Service Area:
+**Service Area:** Metro Atlanta  
+**Minimum Service Price:** $99  
+**AI Booking Discount:** $9 when booking through Ava  
 
-Metro Atlanta
+## Tech Stack
+- Next.js 14 (App Router)
+- React 18
+- Vercel Hosting
+- TypeScript
 
-Minimum Service Price:
-
-$99
-
-AI Booking Discount:
-
-$9 when booking through Ava.
+## Development
