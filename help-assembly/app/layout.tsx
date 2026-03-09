@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Space_Grotesk, Playfair_Display } from 'next/font/google'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from '@vercel/analytics/next'
 import Navbar from '@/components/Navbar'
 import VoiceOrb from '@/components/VoiceOrb'
 import Footer from '@/components/Footer'
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <Footer />
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   )
