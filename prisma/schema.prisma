@@ -1,0 +1,357 @@
+// Ava Command Dashboard - HelpAssembly Platform
+// Complete Service Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// SERVICE MANAGEMENT
+// ============================================================================
+
+// Service Categories
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  color       String?   // Hex color for UI
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  services    Service[]
+}
+
+// Services - Main service offerings
+model Service {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  categoryId  String?
+  category    ServiceCategory? @relation(fields: [categoryId], references: [id])
+  
+  // Pricing
+  basePrice   Float
+  priceType   String    @default("fixed") // fixed, hourly, per_item, tiered
+  minPrice    Float?
+  maxPrice    Float?
+  
+  // Details
+  description String?
+  shortDesc   String?   // Brief description for cards
+  includes    String?   // What's included (comma-separated)
+  duration    Int?      // Estimated duration in minutes
+  
+  // Media
+  imageUrl    String?
+  imageAlt    String?
+  
+  // Status
+  isActive    Boolean   @default(true)
+  isFeatured  Boolean   @default(false)
+  sortOrder   Int       @default(0)
+  
+  // SEO
+  metaTitle   String?
+  metaDesc    String?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  bookings    Booking[]
+  priceRules  PriceRule[]
+  addOns      ServiceAddOn[]
+  
+  @@index([categoryId])
+  @@index([isActive])
+}
+
+// Service Add-ons
+model ServiceAddOn {
+  id          String   @id @default(cuid())
+  serviceId   String
+  service     Service  @relation(fields: [serviceId], references: [id])
+  
+  name        String
+  description String?
+  price       Float
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([serviceId])
+}
+
+// ============================================================================
+// CUSTOMER MANAGEMENT
+// ============================================================================
+
+model Customer {
+  id          String    @id @default(cuid())
+  
+  // Personal Info
+  firstName   String?
+  lastName    String?
+  displayName String?
+  email       String?
+  phone       String?
+  mobile      String?
+  
+  // Company
+  company     String?
+  
+  // Primary Address
+  street      String?
+  unit        String?
+  city        String?
+  state       String?
+  zip         String?
+  
+  // Customer Details
+  notes       String?
+  group       String?   // Customer group/tag
+  source      String?   // Where they came from
+  status      String    @default("Active")
+  
+  // Stats
+  totalSpent  Float     @default(0)
+  totalBookings Int     @default(0)
+  lastServiceDate DateTime?
+  
+  // Timestamps
+  addedOn     String?   // Date added from import
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  // Relations
+  bookings    Booking[]
+  addresses   CustomerAddress[]
+  
+  @@index([email])
+  @@index([phone])
+  @@index([mobile])
+  @@index([status])
+}
+
+// Additional customer addresses
+model CustomerAddress {
+  id          String   @id @default(cuid())
+  customerId  String
+  customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  label       String?  // "Home", "Office", etc.
+  street      String?
+  unit        String?
+  city        String?
+  state       String?
+  zip         String?
+  isDefault   Boolean  @default(false)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([customerId])
+}
+
+// ============================================================================
+// BOOKING MANAGEMENT
+// ============================================================================
+
+model Booking {
+  id            String    @id @default(cuid())
+  
+  // References
+  customerId    String?
+  customer      Customer? @relation(fields: [customerId], references: [id])
+  serviceId     String?
+  service       Service?  @relation(fields: [serviceId], references: [id])
+  technicianId  String?
+  technician    Technician? @relation(fields: [technicianId], references: [id])
+  
+  // Booking Details
+  bookingDate   DateTime? // Scheduled date/time
+  status        String    @default("pending") // pending, confirmed, in_progress, completed, cancelled
+  
+  // Location
+  address       String?
+  city          String?
+  state         String?
+  zip           String?
+  
+  // Pricing
+  basePrice     Float     @default(0)
+  addonsTotal   Float     @default(0)
+  distanceFee   Float     @default(0)
+  urgencyFee    Float     @default(0)
+  discount      Float     @default(0)
+  totalPrice    Float     @default(0)
+  
+  // Notes
+  customerNotes String?
+  internalNotes String?
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  completedAt   DateTime?
+  
+  @@index([customerId])
+  @@index([serviceId])
+  @@index([technicianId])
+  @@index([status])
+  @@index([bookingDate])
+}
+
+// ============================================================================
+// TECHNICIAN MANAGEMENT
+// ============================================================================
+
+model Technician {
+  id            String    @id @default(cuid())
+  
+  // Personal Info
+  firstName     String
+  lastName      String
+  email         String?
+  phone         String?
+  
+  // Status
+  status        String    @default("active") // active, inactive, on_leave
+  isActive      Boolean   @default(true)
+  
+  // Location
+  baseCity      String?
+  baseState     String?
+  serviceRadius Int?      // Miles
+  
+  // Stats
+  rating        Float     @default(0)
+  totalJobs     Int       @default(0)
+  
+  // Availability
+  availability  String?   // JSON schedule
+  
+  // Timestamps
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relations
+  bookings      Booking[]
+  
+  @@index([status])
+  @@index([isActive])
+}
+
+// ============================================================================
+// PRICING INTELLIGENCE
+// ============================================================================
+
+// Dynamic Pricing Rules
+model PriceRule {
+  id            String   @id @default(cuid())
+  serviceId     String?
+  service       Service? @relation(fields: [serviceId], references: [id])
+  
+  // Rule Details
+  name          String
+  type          String   // multiplier, adder, distance, urgency, complexity
+  
+  // Values
+  value         Float    // The multiplier or adder amount
+  
+  // Conditions
+  condition     String?  // JSON conditions
+  priority      Int      @default(0)
+  isActive      Boolean  @default(true)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([serviceId])
+  @@index([type])
+}
+
+// Pricing Configuration
+model PricingConfig {
+  id                    String   @id @default(cuid())
+  
+  // Multipliers
+  atlantaMultiplier     Float    @default(1.10)
+  tampaMultiplier       Float    @default(1.00)
+  orlandoMultiplier     Float    @default(1.00)
+  
+  // Adders
+  sameDayUrgencyAdder   Float    @default(1.15)  // 15% extra
+  nextDayUrgencyAdder   Float    @default(1.08)  // 8% extra
+  
+  // Distance
+  baseDistanceMiles     Int      @default(20)
+  perMileRate           Float    @default(1.50)
+  
+  // Complexity
+  complexityLevels      String?  // JSON
+  
+  updatedAt             DateTime @updatedAt
+}
+
+// ============================================================================
+// SYSTEM
+// ============================================================================
+
+// Activity Log
+model ActivityLog {
+  id          String   @id @default(cuid())
+  
+  action      String   // create, update, delete, status_change
+  entityType  String   // service, customer, booking, technician
+  entityId    String
+  
+  details     String?  // JSON details
+  userId      String?
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([entityType])
+  @@index([entityId])
+  @@index([createdAt])
+}
+
+// Dashboard Stats Cache
+model DashboardStats {
+  id                String   @id @default(cuid())
+  
+  totalRevenue      Float    @default(0)
+  totalBookings     Int      @default(0)
+  totalCustomers    Int      @default(0)
+  activeTechnicians Int      @default(0)
+  
+  pendingBookings   Int      @default(0)
+  completedToday    Int      @default(0)
+  
+  revenueThisMonth  Float    @default(0)
+  bookingsThisMonth Int      @default(0)
+  
+  updatedAt         DateTime @updatedAt
+}
+
+// User for authentication (if needed)
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      String   @default("admin")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
